@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.tamj0rd2.golandnestedtestrunner</id>
-    <name>IntelliJ Platform Plugin goland-nested-test-runner</name>
+    <name>Go Nested Test Runner</name>
     <vendor>tamj0rd2</vendor>
 
     <depends>com.intellij.modules.platform</depends>

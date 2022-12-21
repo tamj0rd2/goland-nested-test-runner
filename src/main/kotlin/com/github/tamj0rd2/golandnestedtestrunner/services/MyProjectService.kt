@@ -13,7 +13,7 @@ class MyProjectService(project: Project) {
 
         NotificationGroupManager.getInstance()
             .getNotificationGroup("Custom Notification Group")
-            .createNotification("Hello world!", NotificationType.ERROR)
+            .createNotification("Hello world!", NotificationType.INFORMATION)
             .notify(project);
     }
 
