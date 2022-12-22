@@ -1,18 +1,8 @@
 # goland-nested-test-runner
 
 ![Build](https://github.com/tamj0rd2/goland-nested-test-runner/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/com.github.tamj0rd2.golandnestedtestrunner.svg)](https://plugins.jetbrains.com/plugin/com.github.tamj0rd2.golandnestedtestrunner)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/com.github.tamj0rd2.golandnestedtestrunner.svg)](https://plugins.jetbrains.com/plugin/com.github.tamj0rd2.golandnestedtestrunner)
-
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [x] Get familiar with the [template documentation][template].
-- [x] Verify the [pluginGroup](./gradle.properties), [plugin ID](./src/main/resources/META-INF/plugin.xml) and [sources package](./src/main/kotlin).
-- [x] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
-- [x] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
-- [x] Set the Plugin ID in the above README badges.
-- [x] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
-- [x] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
+[![Version](https://img.shields.io/jetbrains/plugin/v/20725-go-nested-test-runner.svg)](https://plugins.jetbrains.com/plugin/20725-go-nested-test-runner)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/20725-go-nested-test-runner.svg)](https://plugins.jetbrains.com/plugin/20725-go-nested-test-runner)
 
 <!-- Plugin description -->
 This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
@@ -26,7 +16,7 @@ To keep everything working, do not remove `<!-- ... -->` sections.
 
 - Using IDE built-in plugin system:
   
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "goland-nested-test-runner"</kbd> >
+  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "Go Nested Test Runner"</kbd> >
   <kbd>Install Plugin</kbd>
   
 - Manually:
