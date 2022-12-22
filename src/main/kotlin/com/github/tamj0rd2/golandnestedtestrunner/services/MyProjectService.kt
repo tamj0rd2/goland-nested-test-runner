@@ -21,18 +21,23 @@ class MyProjectService(project: Project) {
             .notify(project);
     }
 
-    fun getFullTestName(element: PsiElement): String {
-        val subtestCallExpr = mustFindNearestSubtestCallExpression(element)
-        if (subtestCallExpr == null) {
-            return "Cover edge case where there is no call expression found"
+    fun getTestRegex(element: PsiElement): String {
+        val subtestCallExpressions = mutableListOf<SubtestCallExpression>()
+
+        var cursor: PsiElement? = element
+        while (cursor != null) {
+            val subtestCallExpr = findNearestSubtestCallExpression(cursor)
+            if (subtestCallExpr != null) {
+                subtestCallExpressions.add(subtestCallExpr)
+            }
+            cursor = subtestCallExpr?.element
         }
 
-        val functionDeclaration = findNearestFunctionDeclaration(subtestCallExpr.element)
-        if (functionDeclaration == null) {
-            return "Cover edge case where there is no function declaration found"
-        }
+        val functionDeclaration = findNearestFunctionDeclaration(subtestCallExpressions.last().element)
+            ?: return "Cover edge case where there is no function declaration found"
 
-        return "^${functionDeclaration.identifier.text}$/^${subtestCallExpr.name}"
+        val testNames = subtestCallExpressions.reversed().joinToString("$/") { "^${it.name}" }
+        return "^${functionDeclaration.identifier.text}$/${testNames}"
     }
 }
 
@@ -43,9 +48,7 @@ data class SubtestCallExpression(val element: GoCallExpr) {
 
 class InvalidSubtestCallExpression(message: String) : Exception(message)
 
-class ParentSubtestCallExpressionNotFound : Exception("parent subtest call expression not found")
-
-fun mustFindNearestSubtestCallExpression(element: PsiElement): SubtestCallExpression {
+fun findNearestSubtestCallExpression(element: PsiElement): SubtestCallExpression? {
     var cursor = element
     var count = 0
 
@@ -60,7 +63,7 @@ fun mustFindNearestSubtestCallExpression(element: PsiElement): SubtestCallExpres
         count++
     } while (count < 100)
 
-    throw ParentSubtestCallExpressionNotFound()
+    return null
 }
 
 fun findNearestFunctionDeclaration(element: PsiElement): GoFunctionDeclaration? {
