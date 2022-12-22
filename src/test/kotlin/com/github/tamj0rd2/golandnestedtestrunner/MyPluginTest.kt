@@ -12,19 +12,27 @@ import junit.framework.TestCase
 class MyPluginTest : BasePlatformTestCase() {
     override fun getTestDataPath() = "src/test/testData/goProject"
 
-    fun testSingleSubtest() {
+    fun testSubtest() {
         assertTestRegexEquals(
             "some_test.go",
-            "My single subtest",
-            "^TestTopLevel$/^My single subtest"
+            "Subtest",
+            "^TestTopLevel$/^Subtest"
         )
     }
 
     fun testNestedSubtest() {
         assertTestRegexEquals(
             "some_test.go",
-            "My nested subtest",
-            "^TestTopLevel$/^My second subtest$/^My nested subtest"
+            "Nested subtest",
+            "^TestTopLevel$/^Subtest$/^Nested_subtest"
+        )
+    }
+
+    fun testDeeplyNestedSubtest() {
+        assertTestRegexEquals(
+            "some_test.go",
+            "Deeply nested subtest",
+            "^TestTopLevel$/^Subtest$/^Nested_subtest$/^Deeply_nested_subtest"
         )
     }
 
@@ -35,7 +43,7 @@ class MyPluginTest : BasePlatformTestCase() {
         val element = testFile.findElementAt(offset)!!
 
         val gotRegex = project.service<MyProjectService>().getTestRegex(element)
-        TestCase.assertEquals(expectedRegex, gotRegex)
+        TestCase.assertEquals("description", expectedRegex, gotRegex)
     }
 
     fun openTestFileInEditor(filePath: String): GoFile {

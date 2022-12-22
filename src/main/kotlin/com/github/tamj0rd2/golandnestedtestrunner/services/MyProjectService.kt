@@ -42,11 +42,8 @@ class MyProjectService(project: Project) {
 }
 
 data class SubtestCallExpression(val element: GoCallExpr) {
-    val name: String = element.argumentList.expressionList[0].value?.string ?:
-    throw InvalidSubtestCallExpression("Call expression has no first argument value:\n${element.text}")
+    val name: String = element.argumentList.expressionList[0].value!!.string!!.replace(" ", "_")
 }
-
-class InvalidSubtestCallExpression(message: String) : Exception(message)
 
 fun findNearestSubtestCallExpression(element: PsiElement): SubtestCallExpression? {
     var cursor = element
