@@ -12,9 +12,4 @@
         <projectService serviceImplementation="com.github.tamj0rd2.golandnestedtestrunner.services.MyProjectService"/>
         <notificationGroup displayType="BALLOON" id="Custom Notification Group"/>
     </extensions>
-
-    <applicationListeners>
-        <listener class="com.github.tamj0rd2.golandnestedtestrunner.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
 </idea-plugin>
