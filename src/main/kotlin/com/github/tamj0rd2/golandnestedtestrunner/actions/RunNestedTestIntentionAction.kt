@@ -20,7 +20,7 @@ class RunNestedTestIntentionAction : PsiElementBaseIntentionAction() {
     override fun invoke(project: Project, editor: Editor?, element: PsiElement) {
         val service = project.service<MyProjectService>()
         service.logMessage(project, "Hello from intention action :D")
-        service.logMessage(project, service.getTestRegex(element))
+        service.getTestRegex(element).forEach{ service.logMessage(project, it) }
     }
 
     override fun getText(): String {

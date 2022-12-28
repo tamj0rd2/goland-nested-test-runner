@@ -24,60 +24,87 @@ class MyProjectService(project: Project) {
             .notify(project);
     }
 
-    fun getTestRegex(element: PsiElement): String {
-        val subtestCallExpressions = mutableListOf<SubtestCallExpression>()
+    fun getTestRegex(element: PsiElement): List<String> {
+        val callExpr = findNearestSubtestCallExpression(element) ?: throw Exception("Couldn't find any subtests for: ${element.text}")
+        val subtest = Subtest.from(callExpr)
+        subtest.debug()
+        return subtest.getFullTestNames()
+    }
+}
 
-        var cursor: PsiElement? = element
-        while (cursor != null) {
-            val subtestCallExpr = findParentSubtest(cursor)
-            cursor = subtestCallExpr?.element
+private data class Subtest(val parents: List<Subtest>, val name: SubtestName) {
 
-            if (subtestCallExpr != null) {
-                subtestCallExpressions.add(subtestCallExpr)
-                continue
+    companion object Factory {
+        fun from(callExpr: GoCallExpr): Subtest {
+            return Subtest(
+                getParents(callExpr),
+                SubtestName(callExpr.argumentList.expressionList[0].value!!.string!!)
+            )
+        }
+
+        fun from(functionDeclaration: GoFunctionDeclaration): Subtest {
+            return Subtest(
+                getParents(functionDeclaration),
+                SubtestName(functionDeclaration.getIdentifier().text)
+            )
+        }
+
+        private fun getParents(element: PsiElement): List<Subtest> {
+            val parentCallExpr = findNearestSubtestCallExpression(element)
+            if (parentCallExpr != null) {
+                return listOf(from(parentCallExpr))
+            }
+
+            val functionDeclaration = PsiTreeUtil.getParentOfType(element, GoFunctionDeclaration::class.java)
+            if (functionDeclaration != null) {
+                val references = ReferencesSearch.search(functionDeclaration).findAll()
+                if (references.size == 0) {
+                    return listOf(Subtest(emptyList(), SubtestName(functionDeclaration.getIdentifier().text)))
+                }
+
+                return buildList { references.forEach { addAll(getParents(it.element)) } }
+            }
+
+            return emptyList()
+        }
+    }
+
+    fun getFullTestNames(): List<String> {
+        if (parents.isEmpty()) {
+            return listOf(this.name.toString())
+        }
+
+        val self = this
+
+        return buildList {
+            parents.forEach { parent ->
+                parent.getFullTestNames().forEach { fullTestName ->
+                    add("$fullTestName/${self.name}")
+                }
             }
         }
+    }
 
-        val testNames = subtestCallExpressions.reversed().joinToString("/") { "^${it.name}$" }
-
-        findHighestFunctionDeclaration(subtestCallExpressions.last().element)?.let {
-            val topLevelTestName = "^${it.getIdentifier().text}\$"
-            return "$topLevelTestName/$testNames"
+    fun debug() {
+        println(this.name.rawName)
+        this.parents.forEach {
+            it.debug()
         }
-
-        throw Exception("Couldn't figure out test regex. Got as far as: ${testNames}")
     }
 }
 
-data class SubtestCallExpression(val element: GoCallExpr) {
-    val name: String = element.argumentList.expressionList[0].value!!.string!!.replace(" ", "_")
-}
+private data class SubtestName(val rawName: String) {
 
-fun findParentSubtest(element: PsiElement): SubtestCallExpression? {
-    var cursor: PsiElement? = element
-    var count = 0
-
-    while (cursor != null && count < 50) {
-        count++
-
-        val callExpr = PsiTreeUtil.getParentOfType(cursor, GoCallExpr::class.java)
-        if (callExpr == null) {
-            val functionDeclaration = PsiTreeUtil.getParentOfType(element, GoFunctionDeclaration::class.java) ?: break
-            cursor = ReferencesSearch.search(functionDeclaration).findFirst()?.element
-            continue
-        }
-
-        if (StringUtils.startsWithAny(callExpr.text, "t.Run")) {
-            return SubtestCallExpression(callExpr)
-        }
-
-        cursor = callExpr
+    private fun sanitize(): String {
+        return rawName.replace(" ", "_")
     }
 
-    return null
+    override fun toString(): String {
+        return "^${sanitize()}\$"
+    }
 }
 
-fun findHighestFunctionDeclaration(element: PsiElement): GoFunctionDeclaration? {
+private fun findHighestFunctionDeclaration(element: PsiElement): GoFunctionDeclaration? {
     var cursor: PsiElement = element
     var lastFound: GoFunctionDeclaration? = null
     var count = 0
@@ -96,4 +123,18 @@ fun findHighestFunctionDeclaration(element: PsiElement): GoFunctionDeclaration? 
     }
 
     return null
+}
+
+private fun findNearestSubtestCallExpression(element: PsiElement): GoCallExpr? {
+    var cursor: PsiElement = element
+
+    while (true) {
+        val callExpr = PsiTreeUtil.getParentOfType(cursor, GoCallExpr::class.java) ?: return null
+
+        if (StringUtils.startsWithAny(callExpr.text, "t.Run")) {
+            return callExpr
+        }
+
+        cursor = callExpr
+    }
 }

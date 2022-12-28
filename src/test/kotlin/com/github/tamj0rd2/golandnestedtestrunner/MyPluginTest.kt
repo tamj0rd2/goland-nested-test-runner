@@ -44,14 +44,23 @@ class MyPluginTest : BasePlatformTestCase() {
         )
     }
 
-    fun assertTestRegexEquals(filePath: String, subtestName: String, expectedRegex: String) {
+    fun testTestFuncWithMultipleUsages() {
+        assertTestRegexEquals(
+            "some_test.go",
+            "Subtest with multiple usages",
+            "^TestTopLevel$/^Subtest$/^First_usage$/^Subtest_with_multiple_usages$",
+            "^TestTopLevel$/^Subtest$/^Second_usage$/^Subtest_with_multiple_usages$"
+        )
+    }
+
+    fun assertTestRegexEquals(filePath: String, subtestName: String, vararg expectedRegexes: String) {
         val testFile = openTestFileInEditor(filePath)
 
         val offset = myFixture.editor.document.text.indexOf(subtestName)
         val element = testFile.findElementAt(offset)!!
 
-        val gotRegex = project.service<MyProjectService>().getTestRegex(element)
-        TestCase.assertEquals("description", expectedRegex, gotRegex)
+        val gotRegexes = project.service<MyProjectService>().getTestRegex(element)
+        TestCase.assertEquals(expectedRegexes.asList(), gotRegexes)
     }
 
     fun openTestFileInEditor(filePath: String): GoFile {

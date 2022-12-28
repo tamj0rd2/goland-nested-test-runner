@@ -10,10 +10,18 @@ func TestTopLevel(t *testing.T) {
 		})
 
 		testFuncWithSingleUsage(t)
+
+		t.Run("First usage", testFuncWithMultipleUsages)
+		t.Run("Second usage", testFuncWithMultipleUsages)
 	})
 }
 
 func testFuncWithSingleUsage(t *testing.T) {
 	t.Run("Subtest with single usage", func(t *testing.T) {
+	})
+}
+
+func testFuncWithMultipleUsages(t *testing.T) {
+	t.Run("Subtest with multiple usages", func(t *testing.T) {
 	})
 }
