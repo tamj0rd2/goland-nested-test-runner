@@ -11,5 +11,9 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.github.tamj0rd2.golandnestedtestrunner.services.MyProjectService"/>
         <notificationGroup displayType="BALLOON" id="Custom Notification Group"/>
+        <intentionAction>
+            <className>com.github.tamj0rd2.golandnestedtestrunner.actions.RunNestedTestIntentionAction</className>
+            <category>SDK intentions</category>
+        </intentionAction>
     </extensions>
 </idea-plugin>

@@ -16,7 +16,7 @@ class MyPluginTest : BasePlatformTestCase() {
         assertTestRegexEquals(
             "some_test.go",
             "Subtest",
-            "^TestTopLevel$/^Subtest"
+            "^TestTopLevel$/^Subtest$"
         )
     }
 
@@ -24,7 +24,7 @@ class MyPluginTest : BasePlatformTestCase() {
         assertTestRegexEquals(
             "some_test.go",
             "Nested subtest",
-            "^TestTopLevel$/^Subtest$/^Nested_subtest"
+            "^TestTopLevel$/^Subtest$/^Nested_subtest$"
         )
     }
 
@@ -32,7 +32,15 @@ class MyPluginTest : BasePlatformTestCase() {
         assertTestRegexEquals(
             "some_test.go",
             "Deeply nested subtest",
-            "^TestTopLevel$/^Subtest$/^Nested_subtest$/^Deeply_nested_subtest"
+            "^TestTopLevel$/^Subtest$/^Nested_subtest$/^Deeply_nested_subtest$"
+        )
+    }
+
+    fun testTestFuncWithSingleUsage() {
+        assertTestRegexEquals(
+            "some_test.go",
+            "Subtest with single usage",
+            "^TestTopLevel$/^Subtest$/^Subtest_with_single_usage$"
         )
     }
 
