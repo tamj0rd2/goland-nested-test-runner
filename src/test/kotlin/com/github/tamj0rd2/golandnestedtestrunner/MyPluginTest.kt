@@ -53,6 +53,16 @@ class MyPluginTest : BasePlatformTestCase() {
         )
     }
 
+    fun testContractUsage() {
+        assertTestRegexEquals(
+            "some_test.go",
+            "Subtest from a contract",
+            "^TestContractFirstUsage$/^First_contract_usage$/^Subtest_from_a_contract$",
+            "^TestContractSecondUsage$/^Second_contract_usage$/^Subtest_from_a_contract$",
+            "^TestContractThirdUsage$/^Contract_nested_usage$/^Subtest_from_a_contract$",
+        )
+    }
+
     fun assertTestRegexEquals(filePath: String, subtestName: String, vararg expectedRegexes: String) {
         val testFile = openTestFileInEditor(filePath)
 
@@ -60,7 +70,8 @@ class MyPluginTest : BasePlatformTestCase() {
         val element = testFile.findElementAt(offset)!!
 
         val gotRegexes = project.service<MyProjectService>().getTestRegex(element)
-        TestCase.assertEquals(expectedRegexes.asList(), gotRegexes)
+        TestCase.assertEquals(expectedRegexes.asList().sorted(), gotRegexes.sorted())
+        println("'$subtestName' results:\n\n${gotRegexes.sorted().joinToString("\n")}")
     }
 
     fun openTestFileInEditor(filePath: String): GoFile {

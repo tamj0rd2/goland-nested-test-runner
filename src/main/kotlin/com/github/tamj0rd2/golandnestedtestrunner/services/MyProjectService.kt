@@ -2,6 +2,7 @@ package com.github.tamj0rd2.golandnestedtestrunner.services
 
 import com.goide.psi.GoCallExpr
 import com.goide.psi.GoFunctionDeclaration
+import com.goide.psi.GoFunctionOrMethodDeclaration
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
@@ -26,9 +27,7 @@ class MyProjectService(project: Project) {
 
     fun getTestRegex(element: PsiElement): List<String> {
         val callExpr = findNearestSubtestCallExpression(element) ?: throw Exception("Couldn't find any subtests for: ${element.text}")
-        val subtest = Subtest.from(callExpr)
-        subtest.debug()
-        return subtest.getFullTestNames()
+        return Subtest.from(callExpr).getFullTestNames()
     }
 }
 
@@ -55,11 +54,12 @@ private data class Subtest(val parents: List<Subtest>, val name: SubtestName) {
                 return listOf(from(parentCallExpr))
             }
 
-            val functionDeclaration = PsiTreeUtil.getParentOfType(element, GoFunctionDeclaration::class.java)
+            val functionDeclaration = PsiTreeUtil.getParentOfType(element, GoFunctionOrMethodDeclaration::class.java)
             if (functionDeclaration != null) {
                 val references = ReferencesSearch.search(functionDeclaration).findAll()
                 if (references.size == 0) {
-                    return listOf(Subtest(emptyList(), SubtestName(functionDeclaration.getIdentifier().text)))
+                    val identifier = functionDeclaration.getIdentifier() ?: throw Exception("Couldn't find identifier for function: ${functionDeclaration.text}")
+                    return listOf(Subtest(emptyList(), SubtestName(identifier.text)))
                 }
 
                 return buildList { references.forEach { addAll(getParents(it.element)) } }
@@ -82,13 +82,6 @@ private data class Subtest(val parents: List<Subtest>, val name: SubtestName) {
                     add("$fullTestName/${self.name}")
                 }
             }
-        }
-    }
-
-    fun debug() {
-        println(this.name.rawName)
-        this.parents.forEach {
-            it.debug()
         }
     }
 }
